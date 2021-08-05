@@ -30,8 +30,10 @@ parameter DELTA_X = 1;
 parameter DELTA_Y = 1;
 parameter BALL_WIDTH = 30;
 parameter BALL_HEIGHT = 30;
-parameter X_RES = 640;
-parameter Y_RES = 480;
+parameter X_RES = 1280;
+parameter Y_RES = 720;
+/* parameter X_RES = 640; */
+/* parameter Y_RES = 480; */
 
 wire [10:0] ball_xdiff = i_hcnt - ball_x;
 wire [10:0] ball_ydiff = i_vcnt - ball_y;

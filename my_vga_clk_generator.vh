@@ -1,5 +1,5 @@
 /*
-my_hdmi_device 
+my_hdmi_device
 
 Copyright (C) 2021  Hirosh Dabui <hirosh@dabui.de>
 
@@ -24,12 +24,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
      VBP             = 33,      \
      VFP             = 10,      \
      VSLEN           = 2,	      \
-     VACTIVE         = 480,	    \
+     VACTIVE         = 720,	    \
 /* horizontal timing frame */   \
      HBP             = 48,	    \
      HFP             = 16,	    \
      HSLEN           = 96,	    \
-     HACTIVE         = 640
+     HACTIVE         = 1280
 
 `define MY_VGA_DECLS \
 localparam VTOTAL            = VACTIVE + VFP + VSLEN + VBP;	\
@@ -56,5 +56,5 @@ initial begin \
   $display("Horizontal refresh:%d", HTOTAL*FRAME_RATE); \
   $display("Framerate:%d", FRAME_RATE); \
   $display("PIXEL Frequency:%d", PIXEL_CLK); \
-end 
+end
 

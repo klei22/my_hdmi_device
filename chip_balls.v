@@ -15,7 +15,7 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-//`define ARTY7 
+//`define ARTY7
 `ifdef ICOBOARD
   `define HX8X
 `endif
@@ -69,8 +69,10 @@ localparam DDR_HDMI_TRANSFER = 1;
 `endif
 
 // calculate video timings
-localparam x_res             = 640;
-localparam y_res             = 480;
+localparam x_res             = 1280;
+localparam y_res             = 720;
+/* localparam x_res             = 640; */
+/* localparam y_res             = 480; */
 localparam frame_rate        = 60;
 
 `include "video_timings.v"
