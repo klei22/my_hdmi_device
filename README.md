@@ -19,29 +19,3 @@ Todo: hdmi-audio (island)
 
 ulx3s:
 make prog
-
-blackicemx:
-
-make -f Makefile.blackicemx prog
-
-icoboard:
-
-make -f Makefile.icoboard prog
-
-icestick:
-cd icestick__hack
-make prog
-
-arty7:
-make -f Makefile.arty7 prog
-But doesn't work, just use vivado SDR/DDR is working
-just use `define ARTY7 in vivado
-
-colorlighti5:
-make -f Makefile.colorlighti5 prog
-
-Have fun!
-
-Hirosh
-
-![hdmi](hdmi.jpg)
