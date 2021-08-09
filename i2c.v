@@ -19,10 +19,10 @@ module i2c (
     input  wire clk,
     input  wire reset,
     output reg  sda,
-    output reg  scl
+    output wire scl
 );
 
-  parameter I2C_ADDR = 7'h69, DATA_PACKET = 8'h05, RW_BIT = 1'h0, START_COUNTER = 8'h0;
+  parameter I2C_ADDR = 7'h69, DATA_PACKET = 8'h05, RW_BIT = 1'h1, START_COUNTER = 8'h0;
 
 
   reg [7:0] data;  // 16 bytes of data, TODO index with params
@@ -36,22 +36,29 @@ module i2c (
   // 8-bit i2c-central
   reg [7:0] state;  // 8 bit state
 
+  reg en_i2c_scl = 0;
+
   initial begin
     data[7:0]  = DATA_PACKET;
     counter    = 0;
     data_index = 0;
     state      = 0;
     sda        = 1;
-    scl        = 1;
+    en_i2c_scl = 0;
+    force_scl  = 1;
   end
 
-  /* assign scl = (en_i2c_scl) ? clk : 1; */
+
+  reg force_scl;
+  // try to get scl on the negedge of the clock
+  assign scl = (en_i2c_scl) ? ~clk : force_scl;
 
   always @(posedge clk) begin
     if (reset == 1) begin
       // INITIALIZE OR RESET I2c-Bus state
       sda <= 1;
-      scl <= 1;
+      en_i2c_scl <= 0;
+      force_scl <= 1;
       counter <= 0;
       data_index <= 0;
       state <= `IDLE;
@@ -59,20 +66,20 @@ module i2c (
       // TODO: Make a snippet for subcase
       case (state)
         `IDLE: begin  //idle, both the sda and scl should be high
-          sda   <= 1;
-          scl   <= 1;
+          sda <= 1;
+          force_scl <= 1;
           state <= `START;
         end
         `START: begin  //start sequence
           // hold the sda low for 8us
           if (counter == 0) begin
             sda <= 0;
-            scl <= 1;
+            force_scl <= 1;
             counter <= counter + 1;
           end else if (counter == 1) begin
             // hold the scl low for 8us
             sda <= 0;
-            scl <= 0;
+            force_scl <= 0;
             counter <= counter + 1;
           end else begin
             // reset counter and send to next state
@@ -81,37 +88,49 @@ module i2c (
           end
         end
         `SEND_ADDR: begin  // send address for writing
-          if (counter < 8) begin
+          if (counter < 7) begin
             sda        <= data[data_index+:1];
-            scl        <= 0;
+            en_i2c_scl <= 1;
+            counter    <= counter + 1;  // increment counter
+            data_index <= data_index + 1;
+          end else if (counter == 7) begin
+            sda        <= RW_BIT;  // RWBIT is a parameter from the top module
+            en_i2c_scl <= 1;
             counter    <= counter + 1;  // increment counter
             data_index <= data_index + 1;
           end else begin
-            counter <= 0;
-            data_index <= data_index + 1;
-            state <= `STOP;
+            sda        <= 0;  // RWBIT is a parameter from the top module
+            en_i2c_scl <= 1;
+            counter    <= 0;
+            data_index <= 0;
+            state      <= `STOP;
           end
         end
         `STOP: begin  // msb address bit
           if (counter == 0) begin
             sda <= 0;
-            scl <= 0;
+            en_i2c_scl <= 0;
+            force_scl <= 0;
+            en_i2c_scl <= 1;
             counter <= counter + 1;
           end else if (counter == 1) begin
             sda <= 0;
-            scl <= 1;
+            en_i2c_scl <= 0;
+            force_scl <= 1;
             counter <= counter + 1;
           end else if (counter == 2) begin
-            sda     <= 1;
-            scl     <= 1;
-            counter <= 0;  // increment counter
-            state   <= 10;
+            sda        <= 1;
+            en_i2c_scl <= 0;
+            force_scl  <= 1;
+            counter    <= 0;  // increment counter
+            state      <= 10;
           end
         end
         10: begin
-          sda     <= 1;
-          scl     <= 1;
-          counter <= 0;
+          sda        <= 1;
+          en_i2c_scl <= 0;
+          force_scl  <= 1;
+          counter    <= 0;
         end
         default: begin
         end
