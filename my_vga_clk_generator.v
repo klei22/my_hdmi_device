@@ -18,19 +18,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 `timescale 1ns / 1ps
 `include "my_vga_clk_generator.vh"
 /* todo: reset */
-module my_vga_clk_generator #( `MY_VGA_DEFAULT_PARAMS ) (
-           input pclk,
-           output out_hsync,
-           output out_vsync,
-           output out_blank,
-           output reg [10:0] out_hcnt, /* 0..2043 */
-           output reg [10:0] out_vcnt, /* 0..2043 */
-           input reset_n
-       );
+module my_vga_clk_generator #(
+    `MY_VGA_DEFAULT_PARAMS
+) (
+    input pclk,
+    output out_hsync,
+    output out_vsync,
+    output out_blank,
+    output reg [10:0] out_hcnt,  /* 0..2043 */
+    output reg [10:0] out_vcnt,  /* 0..2043 */
+    input reset_n
+);
 
-`MY_VGA_DECLS
+  `MY_VGA_DECLS
 
-    /*
+  /*
      *
      *         +
      *         |
@@ -59,20 +61,20 @@ module my_vga_clk_generator #( `MY_VGA_DEFAULT_PARAMS ) (
      *
      */
 
-    /* verilator lint_off UNUSED */
-    wire locked;
+  /* verilator lint_off UNUSED */
+  wire locked;
 
-assign out_vsync = ((out_vcnt >= (VACTIVE + VFP -1)) && (out_vcnt < (VACTIVE + VFP + VSLEN))) ^ ~VPOL;
-assign out_hsync = ((out_hcnt >= (HACTIVE + HFP -1)) && (out_hcnt < (HACTIVE + HFP + HSLEN))) ^ ~HPOL;
-assign out_blank = (out_hcnt >= HACTIVE) || (out_vcnt >= VACTIVE);
+  assign out_vsync = ((out_vcnt >= (VACTIVE + VFP -1)) && (out_vcnt < (VACTIVE + VFP + VSLEN))) ^ ~VPOL;
+  assign out_hsync = ((out_hcnt >= (HACTIVE + HFP -1)) && (out_hcnt < (HACTIVE + HFP + HSLEN))) ^ ~HPOL;
+  assign out_blank = (out_hcnt >= HACTIVE) || (out_vcnt >= VACTIVE);
 
-wire hcycle = out_hcnt == (HTOTAL -1) || ~reset_n;
-wire vcycle = out_vcnt == (VTOTAL -1) || ~reset_n;
+  wire hcycle = out_hcnt == (HTOTAL - 1) || ~reset_n;
+  wire vcycle = out_vcnt == (VTOTAL - 1) || ~reset_n;
 
-always @(posedge pclk) out_hcnt <= hcycle ? 0 : out_hcnt + 1;
+  always @(posedge pclk) out_hcnt <= hcycle ? 0 : out_hcnt + 1;
 
-always @(posedge pclk) begin
+  always @(posedge pclk) begin
     if (hcycle) out_vcnt <= vcycle ? 0 : out_vcnt + 1;
-end
+  end
 
 endmodule
