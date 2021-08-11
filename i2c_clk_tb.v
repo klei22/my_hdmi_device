@@ -12,10 +12,18 @@ module i2c_clk_tb;
 
   /* Make a regular pulsing clock. */
   reg clk = 0;
-  always #2 clk = !clk; // 40ns period, b/c 25MHz freq
+  always #2 clk = !clk;  // 40ns period, b/c 25MHz freq
 
   wire i2c_clk_div;
   i2c_clk i2cclk1 (
+      .clk(clk),
+      .reset(reset),
+      .i2c_clk_div(i2c_clk_div)
+  );
+
+  wire i2c_sda_clk_div;
+
+  i2c_sda_clk i2cclk1 (
       .clk(clk),
       .reset(reset),
       .i2c_clk_div(i2c_clk_div)

@@ -16,7 +16,8 @@
 `define INDEX_NUM_STARTS 2
 
 module i2c (
-    input  wire clk,
+    input  wire sda_clk,
+    input  wire scl_clk,
     input  wire reset,
     output reg  sda,
     output wire scl
@@ -30,8 +31,6 @@ module i2c (
 
   // Note: counter max value has to be at least as large as "CLKS_FOR_..." HOlD params
   reg [7:0] counter;  // 8-bit counter for triggering stage changes after bit transfer
-
-
 
   // 8-bit i2c-central
   reg [7:0] state;  // 8 bit state
@@ -51,9 +50,9 @@ module i2c (
 
   reg force_scl;
   // try to get scl on the negedge of the clock
-  assign scl = (en_i2c_scl) ? ~clk : force_scl;
+  assign scl = (en_i2c_scl) ? ~scl_clk : force_scl;
 
-  always @(posedge clk) begin
+  always @(posedge sda_clk) begin
     if (reset == 1) begin
       // INITIALIZE OR RESET I2c-Bus state
       sda <= 1;
@@ -111,7 +110,6 @@ module i2c (
             sda <= 0;
             en_i2c_scl <= 0;
             force_scl <= 0;
-            en_i2c_scl <= 1;
             counter <= counter + 1;
           end else if (counter == 1) begin
             sda <= 0;

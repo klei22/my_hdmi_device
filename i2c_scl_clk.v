@@ -1,7 +1,7 @@
-module i2c_clk (
+module i2c_sda_clk (
     input  wire clk,
     input  wire reset,
-    output wire i2c_clk_div
+    output wire i2c_sda_clk_div
 );
 
   reg [7:0] clk_taps;
@@ -17,6 +17,6 @@ module i2c_clk (
     end
   end
 
-  assign i2c_clk_div = clk_taps[7];  // div by 256
+  assign i2c_sda_clk_div = clk_taps[7];  // div by 256
 endmodule
 

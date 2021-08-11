@@ -14,21 +14,30 @@ module i2c_tb;
   reg clk = 0;
   always #2 clk = !clk;  // 40ns period, b/c 25MHz freq
 
-  wire i2c_clk_div;
+  wire i2c_scl_clk_div;
 
-  i2c_clk i2cclk1 (
+  i2c_scl_clk i2c_scl_clk_1 (
       .clk(clk),
       .reset(reset),
-      .i2c_clk_div(i2c_clk_div)
+      .i2c_scl_clk_div(i2c_scl_clk_div)
+  );
+
+  wire i2c_sda_clk_div;
+
+  i2c_sda_clk i2c_sda_clk_1 (
+      .clk(clk),
+      .reset(reset),
+      .i2c_sda_clk_div(i2c_sda_clk_div)
   );
 
   wire sda;
   wire scl;
   i2c i2c1 (
-      .clk  (i2c_clk_div),
+      .scl_clk(i2c_scl_clk_div),
+      .sda_clk(i2c_sda_clk_div),
       .reset(reset),
-      .sda  (sda),
-      .scl  (scl)
+      .sda(sda),
+      .scl(scl)
   );
 
 endmodule
